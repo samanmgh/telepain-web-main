@@ -1,0 +1,28 @@
+{
+  "branding": "Tele pain solutions",
+  "header": {
+    "home": "Home",
+    "branding": "branding",
+    "login": "login",
+    "sign_up": "sign_up",
+    "user_panel": "user_panel",
+    "submit_order": "submit_order"
+  },
+  "footer": {
+    "terms": "Terms",
+    "about_us": "About us"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Dont have an account?",
+      "sign_up": "Signup",
+      "email_or_username": "Email address or user name",
+      "password": "Password",
+      "forgot_password": "Forget your password",
+      "remember_me": "Remember me",
+      "invalid_username": "Username is not valid",
+      "invalid_password": "Password is not valid"
+    }
+  }
+}
