@@ -9,15 +9,13 @@ interface LoginFromProps {
   password: string;
 }
 
-export default function LoginForm({onNavigate, setTtl}: {
-  onNavigate: (elem: string) => void,
-  setTtl: (elem: number) => void
-}) {
+export default function LoginForm() {
   const locale = useLocale();
   const t = useTranslations('auth.login');
   const [formData, setFormData] = useState<LoginFromProps>({username: '', password: ''});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setErrors(prevState => {
       if (prevState[event.target.name]) {
@@ -29,6 +27,7 @@ export default function LoginForm({onNavigate, setTtl}: {
     })
     setFormData({...formData, [event.target.name]: event.target.value});
   };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     setLoading(true)
     event.preventDefault();
@@ -45,10 +44,11 @@ export default function LoginForm({onNavigate, setTtl}: {
       //   .finally(() => setLoading(false));
     }
   };
+
   const handleErrors = () => {
     const validationErrors: Record<string, string> = {};
     if (!formData.username) validationErrors.username = t('invalid_username');
-    else if (!formData.password) validationErrors.password = t('invalid_password');
+    if (!formData.password) validationErrors.password = t('invalid_password');
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return false;
@@ -57,7 +57,7 @@ export default function LoginForm({onNavigate, setTtl}: {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="pt-[154px] w-full md:w-[454px]">
+    <form onSubmit={handleSubmit} className="max-md:px-4 pt-[154px] w-full md:w-[454px]">
       <div className="text-center text-[32px] font-medium mb-3">{t('title')}</div>
       <div className='text-center mb-8'>
         <span className="me-1">{t('subtitle')}</span>
@@ -98,7 +98,8 @@ export default function LoginForm({onNavigate, setTtl}: {
         <div className="text-sm mt-2 text-red-500">{errors.password}</div>
       </div>
 
-      <Link className='block underline text-right' href={`/${locale}/auth/forgot-password`}>{t('forgot_password')}</Link>
+      <Link className='block underline text-right'
+            href={`/${locale}/auth/forgot-password`}>{t('forgot_password')}</Link>
 
       <div className="flex items-center gap-x-3 mt-2">
         <input

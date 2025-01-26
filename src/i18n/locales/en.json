@@ -1,5 +1,4 @@
 {
-  "branding": "Tele pain solutions",
   "header": {
     "home": "Home",
     "branding": "branding",
@@ -23,6 +22,22 @@
       "remember_me": "Remember me",
       "invalid_username": "Username is not valid",
       "invalid_password": "Password is not valid"
+    },
+    "register": {
+      "back": "back",
+      "title": "Sign up",
+      "subtitle": "Already have an account?",
+      "sign_in": "Sign in",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "email": "Email",
+      "province": "Province",
+      "city": "City",
+      "zip_code": "Zip Code",
+      "gender": "Gender",
+      "birth_date": "Date of birth",
+      "create_account": "Create an account",
+      "invalid_input": "{key} is not valid"
     }
   }
 }
