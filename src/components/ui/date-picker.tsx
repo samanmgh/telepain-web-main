@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import {
   format,
   subMonths,
@@ -14,15 +14,23 @@ import {CalenderIcon, ChevronLeftIcon, ChevronRightIcon} from "@/assets/icons";
 
 type DatepickerType = "date" | "month" | "year";
 
-export default function DatePicker({error}: { error?: string }) {
+export default function DatePicker({error, onChange}:
+{
+  error?: string;
+  onChange?: (value: string) => void;
+}) {
   const t = useTranslations('auth.register');
   const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
   const [dayCount, setDayCount] = useState<Array<number>>([]);
   const [blankDays, setBlankDays] = useState<Array<number>>([]);
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [datepickerHeaderDate, setDatepickerHeaderDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [type, setType] = useState<DatepickerType>("date");
+
+  useEffect(() => {
+    getDayCount(datepickerHeaderDate);
+  }, [datepickerHeaderDate]);
 
   const decrement = () => {
     switch (type) {
@@ -53,7 +61,7 @@ export default function DatePicker({error}: { error?: string }) {
   };
 
   const isToday = (date: number) =>
-    isEqual(
+    selectedDate && isEqual(
       new Date(selectedDate.getFullYear(), selectedDate.getMonth(), date),
       selectedDate
     );
@@ -66,20 +74,28 @@ export default function DatePicker({error}: { error?: string }) {
         date
       )
     );
+    if (onChange) {
+      const formatedDate = format(new Date(
+        datepickerHeaderDate.getFullYear(),
+        datepickerHeaderDate.getMonth(),
+        date
+      ), "yyyy-MM-dd")
+      onChange(formatedDate);
+    }
     setShowDatepicker(false);
   };
 
   const getDayCount = (date: Date) => {
-    let daysInMonth = getDaysInMonth(date);
+    const daysInMonth = getDaysInMonth(date);
 
     // find where to start calendar day of week
-    let dayOfWeek = getDay(new Date(date.getFullYear(), date.getMonth(), 1));
-    let blankdaysArray = [];
+    const dayOfWeek = getDay(new Date(date.getFullYear(), date.getMonth(), 1));
+    const blankdaysArray = [];
     for (let i = 1; i <= dayOfWeek; i++) {
       blankdaysArray.push(i);
     }
 
-    let daysArray = [];
+    const daysArray = [];
     for (let i = 1; i <= daysInMonth; i++) {
       daysArray.push(i);
     }
@@ -89,7 +105,7 @@ export default function DatePicker({error}: { error?: string }) {
   };
 
   const isSelectedMonth = (month: number) =>
-    isEqual(
+    selectedDate && isEqual(
       new Date(selectedDate.getFullYear(), month, selectedDate.getDate()),
       selectedDate
     );
@@ -111,10 +127,6 @@ export default function DatePicker({error}: { error?: string }) {
 
   const showYearPicker = () => setType("date");
 
-  useEffect(() => {
-    getDayCount(datepickerHeaderDate);
-  }, [datepickerHeaderDate]);
-
   return (
     <div>
       <label htmlFor='datepicker' className='text-gray-100'>
@@ -128,7 +140,7 @@ export default function DatePicker({error}: { error?: string }) {
           readOnly
           className={`cursor-pointer w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${error ? `border-red-500 text-red-500` : `border-gray-100`}`}
           aria-describedby="birth_date-error"
-          value={format(selectedDate, "yyyy-MM-dd")}
+          defaultValue={selectedDate && format(selectedDate, "yyyy-MM-dd")}
           onClick={toggleDatepicker}
         />
         <div
@@ -251,12 +263,36 @@ export default function DatePicker({error}: { error?: string }) {
             )}{" "}
 
             {type === "year" && (
-              <DatePicker
-                datepickerHeaderDate={datepickerHeaderDate}
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                closeDatepicker={() => setShowDatepicker(false)}
-              />
+              <div className="flex flex-wrap -mx-1">
+                {Array(12)
+                  .fill(null)
+                  .map((_, i) => (
+                    <div
+                      key={i}
+                      onClick={() =>
+                        selectedDate && setSelectedDate(
+                          new Date(
+                            datepickerHeaderDate.getFullYear() + i - 6,
+                            selectedDate.getMonth(),
+                            selectedDate.getDate()
+                          )
+                        )
+                      }
+                      style={{ width: "25%" }}
+                    >
+                      <div
+                        className={`cursor-pointer p-5 font-medium text-center text-sm rounded-md hover:bg-gray-50 ${
+                          selectedDate && (datepickerHeaderDate.getFullYear() ===
+                          selectedDate.getFullYear() + i - 6)
+                            ? "bg-secondary-100 text-white"
+                            : "hover:bg-secondary-100 hover:text-white"
+                        }`}
+                      >
+                        {datepickerHeaderDate.getFullYear() + i - 6}
+                      </div>
+                    </div>
+                  ))}
+              </div>
             )}
           </div>
         )}

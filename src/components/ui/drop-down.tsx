@@ -1,5 +1,4 @@
-import React, {useEffect, useRef, useState, ReactNode} from "react";
-import ReactDom from "react-dom";
+import React, {useEffect, useRef, useState} from "react";
 import {CheckIcon, ChevronDownIcon} from "@/assets/icons";
 
 type Placement = "bottom-left" | "bottom-right" | "bottom-center" | "top-left" | "top-right";
@@ -7,7 +6,7 @@ type Trigger = "click" | "hover";
 
 interface DropdownProps {
   data: any[]
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (value: string) => void;
   label?: string;
   name?: string;
   error?: string;
@@ -17,13 +16,9 @@ interface DropdownProps {
   trigger?: Trigger[];
 }
 
-const classNames = (...arr: string[]) => {
-  return arr.join(" ");
-};
-
-const Portal: React.FC<{ children: ReactNode }> = ({children}) => {
-  return ReactDom.createPortal(children, document.body);
-};
+// const Portal: React.FC<{ children: ReactNode }> = ({children}) => {
+//   return ReactDom.createPortal(children, document.body);
+// };
 
 const Dropdown: React.FC<DropdownProps> = ({
                                              onChange,
@@ -135,10 +130,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     setIsOpen(false);
 
     if (onChange) {
-      const event = {
-        target: { name, value: val },
-      } as React.ChangeEvent<HTMLInputElement>;
-      onChange(event);
+      onChange(val);
     }
   };
 

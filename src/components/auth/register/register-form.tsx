@@ -35,16 +35,16 @@ export default function RegisterForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (name: string, value: any) => {
     setErrors(prevState => {
-      if (prevState[event.target.name]) {
-        delete prevState[event.target.name];
+      if (prevState[name]) {
+        delete prevState[name];
       }
       return {
         ...prevState,
       }
     })
-    setFormData({...formData, [event.target.name]: event.target.value});
+    setFormData({...formData, [name]: value});
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -98,7 +98,7 @@ export default function RegisterForm() {
           name="first_name"
           readOnly
           value={formData.first_name}
-          onChange={handleChange}
+          onChange={(e) => handleChange(e.target.name, e.target.value)}
           className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.first_name ? `border-red-500 text-red-500` : `border-gray-100`}`}
           aria-describedby="first_name-error"
         />
@@ -113,7 +113,7 @@ export default function RegisterForm() {
           id="last_name"
           name="last_name"
           value={formData.last_name}
-          onChange={handleChange}
+          onChange={(e) => handleChange(e.target.name, e.target.value)}
           className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.last_name ? `border-red-500 text-red-500` : `border-gray-100`}`}
           aria-describedby="last_name-error"
         />
@@ -129,7 +129,7 @@ export default function RegisterForm() {
           name="email"
           type='email'
           value={formData.email}
-          onChange={handleChange}
+          onChange={(e) => handleChange(e.target.name, e.target.value)}
           className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.email ? `border-red-500 text-red-500` : `border-gray-100`}`}
           aria-describedby="email-error"
         />
@@ -142,7 +142,7 @@ export default function RegisterForm() {
           label={t('province')}
           name='province'
           error={errors.province}
-          onChange={(e) => handleChange(e)}
+          onChange={(value) => handleChange('province', value)}
         />
       </div>
 
@@ -152,7 +152,7 @@ export default function RegisterForm() {
           label={t('city')}
           name='city'
           error={errors.city}
-          onChange={(e) => handleChange(e)}
+          onChange={(value) => handleChange('city', value)}
         />
       </div>
 
@@ -164,7 +164,7 @@ export default function RegisterForm() {
           id="zip_code"
           name="zip_code"
           value={formData.zip_code}
-          onChange={handleChange}
+          onChange={(e) => handleChange(e.target.name, e.target.value)}
           className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.zip_code ? `border-red-500 text-red-500` : `border-gray-100`}`}
           aria-describedby="zip_code-error"
         />
@@ -177,12 +177,14 @@ export default function RegisterForm() {
           label={t('gender')}
           name='gender'
           error={errors.gender}
-          onChange={(e) => handleChange(e)}
+          onChange={(value) => handleChange('gender', value)}
         />
       </div>
 
       <div className='mt-6'>
-        <DatePicker/>
+        <DatePicker
+          onChange={(value) => handleChange('birth_date', value)}
+        />
       </div>
 
       <button
