@@ -10,8 +10,7 @@ export const cityApi = {
       url: "/api/v1/City/provinces"
     }),
   cities: (params: CitiesDetailParams) =>
-    http.get<ApiResponse<void>, CitiesDetailParams>({
-      url: "/api/v1/City/cities",
-      params
+    http.get<ApiResponse<void>>({
+      url: `/api/v1/City/cities/${params.provinceId}`
     })
 };
