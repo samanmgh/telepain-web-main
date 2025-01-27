@@ -24,6 +24,9 @@ const config: Config = {
         'primary': {
           100: '#283F63',
         },
+        secondary: {
+          100: '#7DD2B2'
+        },
         'gray': {
           100: '#666666'
         }

@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import {ArrowBackIcon} from "@/assets/icons";
 import Dropdown from "@/components/ui/drop-down";
+import DatePicker from "@/components/ui/date-picker";
 
 interface LoginFromProps {
   first_name: string;
@@ -181,18 +182,7 @@ export default function RegisterForm() {
       </div>
 
       <div className='mt-6'>
-        <label htmlFor='birth_date' className='text-gray-100'>
-          {t('birth_date')}
-        </label>
-        <input
-          id="birth_date"
-          name="birth_date"
-          value={formData.birth_date}
-          onChange={handleChange}
-          className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.birth_date ? `border-red-500 text-red-500` : `border-gray-100`}`}
-          aria-describedby="birth_date-error"
-        />
-        <div className="text-sm mt-2 text-red-500">{errors.birth_date}</div>
+        <DatePicker/>
       </div>
 
       <button
