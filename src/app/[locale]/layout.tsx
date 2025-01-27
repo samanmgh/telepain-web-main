@@ -6,8 +6,12 @@ import "@/styles/main.scss"
 import {Toaster} from "react-hot-toast";
 import {SWRConfig} from "swr";
 import {getMessages} from "next-intl/server";
+import { Roboto } from 'next/font/google'
 
-// const inter = Inter({subsets: ["latin"]});
+const roboto = Roboto({
+  weight: '400',
+  subsets: ['latin'],
+})
 
 export const metadata: Metadata = {
   title: "Tele pain solutions",
@@ -25,7 +29,7 @@ const RootLayout: React.FC<Props> = async ({children, params}) => {
 
   return (
     <html lang={locale} dir={locale === 'en' ? 'ltr' : 'rtl'}>
-    <body>
+    <body className={roboto.className}>
     <NextIntlClientProvider messages={messages}>
       <SWRConfig>
         {children}
