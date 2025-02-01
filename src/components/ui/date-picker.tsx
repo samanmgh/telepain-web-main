@@ -14,8 +14,9 @@ import {CalenderIcon, ChevronLeftIcon, ChevronRightIcon} from "@/assets/icons";
 
 type DatepickerType = "date" | "month" | "year";
 
-export default function DatePicker({error, onChange}:
+export default function DatePicker({error, onChange, label}:
 {
+  label?: string;
   error?: string;
   onChange?: (value: string) => void;
 }) {
@@ -130,9 +131,8 @@ export default function DatePicker({error, onChange}:
   return (
     <div>
       <label htmlFor='datepicker' className='text-gray-100'>
-        {t('birth_date')}
+        {label}
       </label>
-
       <div className="relative">
         <input type="hidden" name="date"/>
         <input
@@ -278,12 +278,12 @@ export default function DatePicker({error, onChange}:
                           )
                         )
                       }
-                      style={{ width: "25%" }}
+                      style={{width: "25%"}}
                     >
                       <div
                         className={`cursor-pointer p-5 font-medium text-center text-sm rounded-md hover:bg-gray-50 ${
                           selectedDate && (datepickerHeaderDate.getFullYear() ===
-                          selectedDate.getFullYear() + i - 6)
+                            selectedDate.getFullYear() + i - 6)
                             ? "bg-secondary-100 text-white"
                             : "hover:bg-secondary-100 hover:text-white"
                         }`}
@@ -297,6 +297,7 @@ export default function DatePicker({error, onChange}:
           </div>
         )}
       </div>
+      <div className="text-sm mt-2 text-red-500">{error}</div>
     </div>
   );
 }

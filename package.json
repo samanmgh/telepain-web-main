@@ -10,6 +10,7 @@
     "api": "swagger-typescript-api --no-client --modular --responses --extract-request-params -p https://api.telepainsolutions.ca/identity-service/swagger/v1/swagger.json -o ./src/types/api"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.10.0",
     "cookies-next": "^5.1.0",
     "date-fns": "^4.1.0",
     "next": "15.1.6",
@@ -17,10 +18,13 @@
     "query-string": "^9.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
     "react-hot-toast": "^2.5.1",
     "sass": "^1.83.4",
     "swagger-typescript-api": "^13.0.23",
-    "swr": "^2.3.0"
+    "swr": "^2.3.0",
+    "zod": "^3.24.1",
+    "zod-form-data": "^2.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

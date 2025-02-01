@@ -1,81 +1,178 @@
 import {useLocale, useTranslations} from "next-intl";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import {ArrowBackIcon} from "@/assets/icons";
 import Dropdown from "@/components/ui/drop-down";
 import DatePicker from "@/components/ui/date-picker";
+import z from "zod";
+import {zfd} from "zod-form-data";
+import {Controller, useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useRequest} from "@/services/api/use-request";
+import {cityApi} from "@/services/api/city";
+import {CityDetail} from "@/types";
+import EyeIcon from "@/assets/icons/eye-icon";
+import {authApi} from "@/services/api/auth";
 
-interface LoginFromProps {
-  first_name: string;
-  last_name: string;
-  email: string;
-  province: string;
-  city: string;
-  zip_code: string;
-  gender: string;
-  birth_date: string;
-}
 
-const initialData = {
-  first_name: '',
-  last_name: '',
-  email: '',
-  province: '',
-  city: '',
-  zip_code: '',
-  gender: '',
-  birth_date: '',
-}
+export const UPPERCASE_REGEX = /[A-Z]/;
+export const LOWERCASE_REGEX = /[a-z]/;
+export const NUM_AND_SYM_REGEX = /[!@#$%^&*(),.?":{}|<>]/;
+export const NUMBER_REGEX = /[0-9]/;
+
+export const registerSchema = () => zfd.formData({
+  userName: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .default("")
+  ),
+  firstName: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .default("")
+  ),
+  lastName: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .default("")
+  ),
+  email: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .email({message: "This email is not correct."})
+      .default("")
+  ),
+  phoneNumber: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(8, "This field is required.")
+      .default("")
+  ),
+  password: zfd.text(
+    z
+      .string({required_error: "This field is required."})
+      .min(8, "Use 8 or more characters.")
+      .refine((value) => UPPERCASE_REGEX.test(value), "Use upper and lower case letters (e.g. Aa).")
+      .refine((value) => LOWERCASE_REGEX.test(value), "Use upper and lower case letters (e.g. Aa).")
+      .refine((value) => NUM_AND_SYM_REGEX.test(value), "Use a symbol (e.g. !@#$).")
+      .refine((value) => NUMBER_REGEX.test(value), "Use a number (e.g. 1234).")
+      .default("")
+  ),
+  confirmPassword: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .default("")
+  ),
+  provinceId: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .default("")
+  ),
+  cityId: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .default("")
+  ),
+  zipCode: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .default("")
+  ),
+  gender: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .default("")
+  ),
+  dateOfBirth: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .default("")
+  ),
+}).superRefine((data, ctx) => {
+  if (data.password !== data.confirmPassword) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["confirmPassword"],
+      message: "Passwords mismatch.",
+      fatal: true,
+    });
+  }
+});
+
+export type registerCredentials = z.infer<ReturnType<typeof registerSchema>>;
 
 export default function RegisterForm() {
   const locale = useLocale();
   const t = useTranslations('auth.register');
-  const [formData, setFormData] = useState<LoginFromProps>(initialData);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const genderData = [
+    {id: 0, name: "Male"},
+    {id: 1, name: "Female"},
+    {id: 2, name: "Not prefer to say"},
+  ];
+  const form = useForm<registerCredentials>({
+    resolver: zodResolver(registerSchema()),
+    defaultValues: {
+      userName: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      password: "",
+      confirmPassword: "",
+      provinceId: "",
+      cityId: "",
+      zipCode: "",
+      gender: "",
+      dateOfBirth: ""
+    },
+    mode: "all",
+  });
   const [loading, setLoading] = useState(false);
+  const [cityData, setCityData] = useState<CityDetail[]>([]);
+  const [passType, setPassType] = useState<boolean>(false);
+  const {data: provinces} = useRequest(cityApi.provinces());
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    form.watch('provinceId') && getCitiesData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.watch('provinceId')]);
 
-  const handleChange = (name: string, value: any) => {
-    setErrors(prevState => {
-      if (prevState[name]) {
-        delete prevState[name];
-      }
-      return {
-        ...prevState,
-      }
-    })
-    setFormData({...formData, [name]: value});
+  const getCitiesData = async () => {
+    try {
+      const city = await cityApi.cities({provinceId: Number(form.watch('provinceId'))}).fetch();
+      if(city.data) setCityData(city.data as any);
+    } catch (e) {
+      console.log(e)
+    }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    setLoading(true)
+  const handleShowPassword = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
-    if (handleErrors()) {
-      // Auth.createOtp({mobile_number: formData.mobile_number}).then((response) => {
-      //   if (response.meta.statusCode === 200) {
-      //     toast.success(response.meta.displayMessage);
-      //     setTtl(response.data.validOTPSeconds);
-      //     onNavigate(formData.mobile_number);
-      //     setFormData({mobile_number: ''});
-      //     setErrors({});
-      //   }
-      // })
-      //   .finally(() => setLoading(false));
-    }
+    setPassType(!passType);
   };
-  const handleErrors = () => {
-    const validationErrors: Record<string, string> = {};
-    if (!formData.first_name) validationErrors.first_name = t('invalid_input', {key: t('first_name')});
-    if (!formData.last_name) validationErrors.last_name = t('invalid_input', {key: t('last_name')});
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return false;
+
+  const handleSubmit = async (data: registerCredentials) => {
+    if(loading) return;
+    setLoading(true);
+    try {
+      const res = await authApi.register({
+        ...data,
+        provinceId: Number(data.provinceId),
+        cityId: Number(data.cityId),
+        gender: Number(data.gender),
+        dateOfBirth: new Date(data.dateOfBirth).toISOString()
+      }).fetch();
+      toast.success(res.meta.displayMessage);
+    } catch (e){
+      console.log(e);
+    } finally {
+      setLoading(false);
     }
-    return true;
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-md:px-4 pt-[32.5px] pb-[125px] w-full md:w-[454px]">
+    <form autoComplete="off" onSubmit={form.handleSubmit(handleSubmit)}
+          className="max-md:px-4 pt-[32.5px] pb-[125px] w-full md:w-[454px]">
       <Link href={`/${locale}/auth/login`} className='flex'>
         <ArrowBackIcon/>
         <span className='ms-3'>
@@ -89,103 +186,243 @@ export default function RegisterForm() {
         <Link className='underline' href={`/${locale}/auth/login`}>{t('sign_in')}</Link>
       </div>
 
-      <div>
-        <label htmlFor='first_name' className='text-gray-100'>
-          {t('first_name')}
-        </label>
-        <input
-          id="first_name"
-          name="first_name"
-          readOnly
-          value={formData.first_name}
-          onChange={(e) => handleChange(e.target.name, e.target.value)}
-          className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.first_name ? `border-red-500 text-red-500` : `border-gray-100`}`}
-          aria-describedby="first_name-error"
-        />
-        <div className="text-sm mt-2 text-red-500">{errors.first_name}</div>
-      </div>
+      <Controller
+        control={form.control}
+        name="userName"
+        render={({field}) => (
+          <div>
+            <label htmlFor='userName' className='text-gray-100'>
+              {t('user_name')}
+            </label>
+            <input
+              id="userName"
+              value={field.value}
+              onChange={field.onChange}
+              className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${form.formState.errors.userName?.message ? `border-red-500 text-red-500` : `border-gray-100`}`}
+              aria-describedby="first_name-error"
+            />
+            {form.formState.errors.userName?.message &&
+              <div className="text-sm mt-2 text-red-500">{form.formState.errors.userName?.message}</div>}
+          </div>
+        )}
+      />
 
-      <div className='mt-6'>
-        <label htmlFor='last_name' className='text-gray-100'>
-          {t('last_name')}
-        </label>
-        <input
-          id="last_name"
-          name="last_name"
-          value={formData.last_name}
-          onChange={(e) => handleChange(e.target.name, e.target.value)}
-          className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.last_name ? `border-red-500 text-red-500` : `border-gray-100`}`}
-          aria-describedby="last_name-error"
-        />
-        <div className="text-sm mt-2 text-red-500">{errors.last_name}</div>
-      </div>
+      <Controller
+        control={form.control}
+        name="firstName"
+        render={({field}) => (
+          <div className="mt-6">
+            <label htmlFor='firstName' className='text-gray-100'>
+              {t('first_name')}
+            </label>
+            <input
+              id="firstName"
+              value={field.value}
+              onChange={field.onChange}
+              className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${form?.formState?.errors?.firstName?.message ? `border-red-500 text-red-500` : `border-gray-100`}`}
+              aria-describedby="first_name-error"
+            />
+            {form?.formState?.errors?.firstName?.message &&
+              <div className="text-sm mt-2 text-red-500">{form?.formState?.errors?.firstName?.message}</div>}
+          </div>
+        )}
+      />
 
-      <div className='mt-6'>
-        <label htmlFor='email' className='text-gray-100'>
-          {t('email')}
-        </label>
-        <input
-          id="email"
-          name="email"
-          type='email'
-          value={formData.email}
-          onChange={(e) => handleChange(e.target.name, e.target.value)}
-          className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.email ? `border-red-500 text-red-500` : `border-gray-100`}`}
-          aria-describedby="email-error"
-        />
-        <div className="text-sm mt-2 text-red-500">{errors.email}</div>
-      </div>
+      <Controller
+        control={form.control}
+        name="lastName"
+        render={({field}) => (
+          <div className='mt-6'>
+            <label htmlFor='lastName' className='text-gray-100'>
+              {t('last_name')}
+            </label>
+            <input
+              id="lastName"
+              value={field.value}
+              onChange={field.onChange}
+              className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${form.formState.errors.lastName?.message ? `border-red-500 text-red-500` : `border-gray-100`}`}
+              aria-describedby="last_name-error"
+            />
+            {form.formState.errors.lastName?.message &&
+              <div className="text-sm mt-2 text-red-500">{form.formState.errors.lastName?.message}</div>}
+          </div>
+        )}
+      />
 
-      <div className='mt-6'>
-        <Dropdown
-          data={['Toronto', 'Vancouver', 'Québec']}
-          label={t('province')}
-          name='province'
-          error={errors.province}
-          onChange={(value) => handleChange('province', value)}
-        />
-      </div>
+      <Controller
+        control={form.control}
+        name="email"
+        render={({field}) => (
+          <div className='mt-6'>
+            <label htmlFor='email' className='text-gray-100'>
+              {t('email')}
+            </label>
+            <input
+              id="email"
+              type='email'
+              value={field.value}
+              onChange={field.onChange}
+              className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${form.formState.errors.email?.message ? `border-red-500 text-red-500` : `border-gray-100`}`}
+              aria-describedby="email-error"
+            />
+            {form.formState.errors.email?.message &&
+              <div className="text-sm mt-2 text-red-500">{form.formState.errors.email?.message}</div>}
+          </div>
+        )}
+      />
 
-      <div className='mt-6'>
-        <Dropdown
-          data={['Toronto', 'Vancouver', 'Québec']}
-          label={t('city')}
-          name='city'
-          error={errors.city}
-          onChange={(value) => handleChange('city', value)}
-        />
-      </div>
+      <Controller
+        control={form.control}
+        name="phoneNumber"
+        render={({field}) => (
+          <div className='mt-6'>
+            <label htmlFor='phoneNumber' className='text-gray-100'>
+              {t('phone_number')}
+            </label>
+            <input
+              id="phoneNumber"
+              value={field.value}
+              placeholder={'+12505550199'}
+              type="tel"
+              onChange={field.onChange}
+              className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${form.formState.errors.phoneNumber?.message ? `border-red-500 text-red-500` : `border-gray-100`}`}
+              aria-describedby="last_name-error"
+            />
+            {form.formState.errors.phoneNumber?.message &&
+              <div className="text-sm mt-2 text-red-500">{form.formState.errors.phoneNumber?.message}</div>}
+          </div>
+        )}
+      />
 
-      <div className='mt-6'>
-        <label htmlFor='zip_code' className='text-gray-100'>
-          {t('zip_code')}
-        </label>
-        <input
-          id="zip_code"
-          name="zip_code"
-          value={formData.zip_code}
-          onChange={(e) => handleChange(e.target.name, e.target.value)}
-          className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.zip_code ? `border-red-500 text-red-500` : `border-gray-100`}`}
-          aria-describedby="zip_code-error"
-        />
-        <div className="text-sm mt-2 text-red-500">{errors.zip_code}</div>
-      </div>
+      <Controller
+        control={form.control}
+        name="password"
+        render={({field}) => (
+          <div className='mt-6'>
+            <label htmlFor='password' className='text-gray-100 flex justify-between'>
+              {t('password')}
+              <button onClick={handleShowPassword}>
+                <EyeIcon/>
+              </button>
+            </label>
+            <input
+              id="password"
+              value={field.value}
+              type={passType ? "text" : "password"}
+              onChange={field.onChange}
+              className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${form.formState.errors.password?.message ? `border-red-500 text-red-500` : `border-gray-100`}`}
+              aria-describedby="last_name-error"
+            />
+            {form.formState.errors.password?.message &&
+              <div className="text-sm mt-2 text-red-500">{form.formState.errors.password?.message}</div>}
+          </div>
+        )}
+      />
 
-      <div className='mt-6'>
-        <Dropdown
-          data={['Male', 'Female']}
-          label={t('gender')}
-          name='gender'
-          error={errors.gender}
-          onChange={(value) => handleChange('gender', value)}
-        />
-      </div>
+      <Controller
+        control={form.control}
+        name="confirmPassword"
+        render={({field}) => (
+          <div className='mt-6'>
+            <label htmlFor='password' className='text-gray-100 flex justify-between'>
+              {t('confirm_password')}
+              <button onClick={handleShowPassword}>
+                <EyeIcon/>
+              </button>
+            </label>
+            <input
+              id="confirmPassword"
+              value={field.value}
+              type="password"
+              onChange={field.onChange}
+              className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${form.formState.errors.confirmPassword?.message ? `border-red-500 text-red-500` : `border-gray-100`}`}
+              aria-describedby="last_name-error"
+            />
+            {form.formState.errors.confirmPassword?.message &&
+              <div className="text-sm mt-2 text-red-500">{form.formState.errors.confirmPassword?.message}</div>}
+          </div>
+        )}
+      />
 
-      <div className='mt-6'>
-        <DatePicker
-          onChange={(value) => handleChange('birth_date', value)}
-        />
-      </div>
+      <Controller
+        control={form.control}
+        name="provinceId"
+        render={({field}) => (
+          <div className='mt-6'>
+            <Dropdown
+              data={provinces?.data as any}
+              label={t('province')}
+              error={form.formState.errors.provinceId?.message}
+              {...field}
+            />
+          </div>
+        )}
+      />
+
+      <Controller
+        control={form.control}
+        name="cityId"
+        render={({field}) => (
+          <div className='mt-6'>
+            <Dropdown
+              data={cityData}
+              label={t('city')}
+              error={form.formState.errors.cityId?.message}
+              {...field}
+            />
+          </div>
+        )}
+      />
+
+      <Controller
+        control={form.control}
+        name="zipCode"
+        render={({field}) => (
+          <div className='mt-6'>
+            <label htmlFor='zip_code' className='text-gray-100'>
+              {t('zip_code')}
+            </label>
+            <input
+              id="zip_code"
+              value={field.value}
+              onChange={field.onChange}
+              className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${form.formState.errors.zipCode?.message ? `border-red-500 text-red-500` : `border-gray-100`}`}
+              aria-describedby="zip_code-error"
+            />
+            {form.formState.errors.zipCode?.message &&
+              <div className="text-sm mt-2 text-red-500">{form.formState.errors.zipCode?.message}</div>}
+          </div>
+        )}
+      />
+
+      <Controller
+        control={form.control}
+        name="gender"
+        render={({field}) => (
+          <div className='mt-6'>
+            <Dropdown
+              data={genderData}
+              label={t('gender')}
+              error={form.formState.errors.gender?.message}
+              {...field}
+            />
+          </div>
+        )}
+      />
+
+      <Controller
+        control={form.control}
+        name="dateOfBirth"
+        render={({field}) => (
+          <div className='mt-6'>
+            <DatePicker
+              label={t('birth_date')}
+              error={form.formState.errors.dateOfBirth?.message}
+              {...field}
+            />
+          </div>
+        )}
+      />
 
       <button
         type="submit"

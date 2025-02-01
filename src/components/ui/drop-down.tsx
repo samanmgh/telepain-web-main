@@ -41,6 +41,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     if (elementRef.current) {
       setInputWidth(elementRef.current.offsetWidth);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [elementRef.current]);
 
   useEffect(() => {
@@ -165,19 +166,20 @@ const Dropdown: React.FC<DropdownProps> = ({
         {isOpen && <div
           ref={dropdownRef}
           className='absolute mt-2 z-50 shadow-custom-dropdown rounded-md transition'
-          style={{ width: inputWidth ? `${inputWidth}px` : 'auto' }}
+          style={{width: inputWidth ? `${inputWidth}px` : 'auto'}}
         >
           <ul className='bg-white'>
             {data.map((item, i) => (
               <li
                 key={i}
                 className='flex items-center border-b border-[#E1E3E3] p-[9px] hover:bg-gray-50 cursor-pointer text-sm'
-                onClick={() => handleSelect(item)}
+                onClick={() => handleSelect(String(item.id))}
               >
-                <div className={`flex items-center justify-center me-4 h-[22px] w-[22px] rounded-full border border-[#09090B] ${value === item && 'bg-black'}`}>
-                  {value === item && <CheckIcon/>}
+                <div
+                  className={`flex items-center justify-center me-4 h-[22px] w-[22px] rounded-full border border-[#09090B] ${value === item && 'bg-black'}`}>
+                  {value === String(item.id) && <CheckIcon/>}
                 </div>
-                {item}
+                {item.name}
               </li>
             ))}
           </ul>

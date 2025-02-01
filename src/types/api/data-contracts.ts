@@ -177,3 +177,36 @@ export interface VAuthConfirmEmailDetailParams {
 export interface CitiesDetailParams {
   provinceId: number;
 }
+
+export interface ProvinceDetailsResult {
+  data: ProvinceDetail[]
+}
+
+export interface ProvinceDetail {
+  name: string,
+  cities: string | null,
+  id: number,
+  createdBy: string | null,
+  createdDate: string,
+  lastModifiedBy: string | null,
+  lastModifiedDate: string | null,
+  isDeleted: boolean,
+  deletedDate: string | null
+}
+
+export interface CityDetailsResult {
+  data: CityDetail[];
+}
+
+export interface CityDetail {
+  name: string,
+  provinceId: number,
+  province: string | null,
+  id: number,
+  createdBy: string | null,
+  createdDate: string,
+  lastModifiedBy: string | null,
+  lastModifiedDate: string | null,
+  isDeleted: boolean,
+  deletedDate: string | null
+}
