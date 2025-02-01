@@ -9,7 +9,6 @@ import {
   getDaysInMonth,
   getDay
 } from "date-fns";
-import {useTranslations} from "next-intl";
 import {CalenderIcon, ChevronLeftIcon, ChevronRightIcon} from "@/assets/icons";
 
 type DatepickerType = "date" | "month" | "year";
@@ -20,7 +19,6 @@ export default function DatePicker({error, onChange, label}:
   error?: string;
   onChange?: (value: string) => void;
 }) {
-  const t = useTranslations('auth.register');
   const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
   const [dayCount, setDayCount] = useState<Array<number>>([]);
   const [blankDays, setBlankDays] = useState<Array<number>>([]);
