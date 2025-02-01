@@ -1,5 +1,5 @@
 import {
-  ApiResponse, ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto, VAuthConfirmEmailDetailParams,
+  ApiResponse, ForgotPasswordDto, LoginDto, LoginResult, RegisterDto, ResetPasswordDto, VAuthConfirmEmailDetailParams,
 } from "@/types";
 import {http} from "../http";
 
@@ -10,7 +10,7 @@ export const authApi = {
       data,
     }),
   login: (data: LoginDto) =>
-    http.post<ApiResponse<void>, LoginDto>({
+    http.post<ApiResponse<LoginResult>, LoginDto>({
       url: "/api/v1/Auth/login",
       data,
     }),

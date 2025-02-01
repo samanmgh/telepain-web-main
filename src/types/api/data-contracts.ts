@@ -210,3 +210,10 @@ export interface CityDetail {
   isDeleted: boolean,
   deletedDate: string | null
 }
+
+export interface LoginResult {
+  token: string;
+  refreshToken: string;
+  refreshTokenExpiryTime: string;
+  userId: string;
+}

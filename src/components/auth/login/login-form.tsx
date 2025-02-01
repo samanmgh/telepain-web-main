@@ -3,100 +3,119 @@ import React, {useState} from "react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import EyeIcon from "@/assets/icons/eye-icon";
+import {zfd} from "zod-form-data";
+import z from "zod";
+import {Controller, useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {authApi} from "@/services/api/auth";
+import {setCookie} from "cookies-next";
+import {useRouter} from "next/navigation";
 
-interface LoginFromProps {
-  username: string;
-  password: string;
-}
+export const loginSchema = () => zfd.formData({
+  email: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .email({message: "This email is not correct."})
+      .default("")
+  ),
+  password: zfd.text(
+    z.string({required_error: "This field is required."})
+      .min(1, "This field is required.")
+      .default("")
+  ),
+});
+
+export type loginCredentials = z.infer<ReturnType<typeof loginSchema>>;
 
 export default function LoginForm() {
   const locale = useLocale();
+  const router = useRouter();
   const t = useTranslations('auth.login');
-  const [formData, setFormData] = useState<LoginFromProps>({username: '', password: ''});
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [passType, setPassType] = useState<boolean>(false);
+  const form = useForm<loginCredentials>({
+    resolver: zodResolver(loginSchema()),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "all",
+  });
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setErrors(prevState => {
-      if (prevState[event.target.name]) {
-        delete prevState[event.target.name];
-      }
-      return {
-        ...prevState,
-      }
-    })
-    setFormData({...formData, [event.target.name]: event.target.value});
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    setLoading(true)
+  const handleShowPassword = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
-    if (handleErrors()) {
-      // Auth.createOtp({mobile_number: formData.mobile_number}).then((response) => {
-      //   if (response.meta.statusCode === 200) {
-      //     toast.success(response.meta.displayMessage);
-      //     setTtl(response.data.validOTPSeconds);
-      //     onNavigate(formData.mobile_number);
-      //     setFormData({mobile_number: ''});
-      //     setErrors({});
-      //   }
-      // })
-      //   .finally(() => setLoading(false));
-    }
+    setPassType(!passType);
   };
 
-  const handleErrors = () => {
-    const validationErrors: Record<string, string> = {};
-    if (!formData.username) validationErrors.username = t('invalid_username');
-    if (!formData.password) validationErrors.password = t('invalid_password');
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return false;
+  const handleSubmit = async (data: loginCredentials) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const res = await authApi.login({...data}).fetch();
+      localStorage.setItem('accessToken', res.data.token);
+      setCookie("accessToken", res.data.token, {path: '/'});
+      toast.success(res.meta.displayMessage);
+      router.push('/');
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
     }
-    return true;
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-md:px-4 pt-[154px] w-full md:w-[454px]">
+    <form autoComplete="off" onSubmit={form.handleSubmit(handleSubmit)}
+          className="max-md:px-4 pt-[154px] w-full md:w-[454px]">
       <div className="text-center text-[32px] font-medium mb-3">{t('title')}</div>
       <div className='text-center mb-8'>
         <span className="me-1">{t('subtitle')}</span>
         <Link className='underline' href={`/${locale}/auth/register`}>{t('sign_up')}</Link>
       </div>
 
-      <div>
-        <label htmlFor='username' className='text-gray-100'>
-          {t('email_or_username')}
-        </label>
-        <input
-          id="username"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-          className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.username ? `border-red-500 text-red-500` : `border-gray-100`}`}
-          aria-describedby="username-error"
-        />
-        <div className="text-sm mt-2 text-red-500">{errors.username}</div>
-      </div>
+      <Controller
+        control={form.control}
+        name="email"
+        render={({field}) => (
+          <div>
+            <label htmlFor='email' className='text-gray-100'>
+              {t('email_or_username')}
+            </label>
+            <input
+              id="email"
+              value={field.value}
+              onChange={field.onChange}
+              className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${form.formState.errors.email?.message ? `border-red-500 text-red-500` : `border-gray-100`}`}
+            />
+            {form.formState.errors.email?.message &&
+              <div className="text-sm mt-2 text-red-500">{form.formState.errors.email?.message}</div>}
+          </div>
+        )}
+      />
 
-      <div className='mt-6 mb-2'>
-        <label htmlFor='password' className='text-gray-100 flex justify-between'>
-          {t('password')}
-          <button>
-            <EyeIcon/>
-          </button>
-        </label>
-        <input
-          id="password"
-          name="password"
-          type='password'
-          value={formData.password}
-          onChange={handleChange}
-          className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${errors.password ? `border-red-500 text-red-500` : `border-gray-100`}`}
-          aria-describedby="password-error"
-        />
-        <div className="text-sm mt-2 text-red-500">{errors.password}</div>
-      </div>
+      <Controller
+        control={form.control}
+        name="password"
+        render={({field}) => (
+          <div className='mt-6 mb-2'>
+            <label htmlFor='password' className='text-gray-100 flex justify-between'>
+              {t('password')}
+              <button onClick={handleShowPassword}>
+                <EyeIcon/>
+              </button>
+            </label>
+            <input
+              id="password"
+              type={passType ? "text" : "password"}
+              value={field.value}
+              onChange={field.onChange}
+              className={`w-full h-[56px] mt-3 rounded-xl border-gray-100 focus:ring-0 ${form.formState.errors.password?.message ? `border-red-500 text-red-500` : `border-gray-100`}`}
+              aria-describedby="password-error"
+            />
+            {form.formState.errors.password?.message &&
+              <div className="text-sm mt-2 text-red-500">{form.formState.errors.password?.message}</div>}
+          </div>
+        )}
+      />
 
       <Link className='block underline text-right'
             href={`/${locale}/auth/forgot-password`}>{t('forgot_password')}</Link>
