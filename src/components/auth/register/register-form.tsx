@@ -14,6 +14,7 @@ import {cityApi} from "@/services/api/city";
 import {CityDetail} from "@/types";
 import EyeIcon from "@/assets/icons/eye-icon";
 import {authApi} from "@/services/api/auth";
+import {useRouter} from "next/navigation";
 
 
 export const UPPERCASE_REGEX = /[A-Z]/;
@@ -104,6 +105,7 @@ export type registerCredentials = z.infer<ReturnType<typeof registerSchema>>;
 export default function RegisterForm() {
   const locale = useLocale();
   const t = useTranslations('auth.register');
+  const router = useRouter();
   const genderData = [
     {id: 0, name: "Male"},
     {id: 1, name: "Female"},
@@ -163,6 +165,7 @@ export default function RegisterForm() {
         dateOfBirth: new Date(data.dateOfBirth).toISOString()
       }).fetch();
       toast.success(res.meta.displayMessage);
+      router.push(`/${locale}/auth/login`);
     } catch (e){
       console.log(e);
     } finally {
