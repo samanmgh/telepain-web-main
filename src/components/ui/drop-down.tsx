@@ -127,7 +127,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   };
 
   const handleSelect = (val: string) => {
-    setValue(val);
+    setValue(data.find(elem => String(elem.id) === val).name);
     setIsOpen(false);
 
     if (onChange) {
@@ -169,19 +169,22 @@ const Dropdown: React.FC<DropdownProps> = ({
           style={{width: inputWidth ? `${inputWidth}px` : 'auto'}}
         >
           <ul className='bg-white'>
-            {data.map((item, i) => (
-              <li
-                key={i}
-                className='flex items-center border-b border-[#E1E3E3] p-[9px] hover:bg-gray-50 cursor-pointer text-sm'
-                onClick={() => handleSelect(String(item.id))}
-              >
-                <div
-                  className={`flex items-center justify-center me-4 h-[22px] w-[22px] rounded-full border border-[#09090B] ${value === item && 'bg-black'}`}>
-                  {value === String(item.id) && <CheckIcon/>}
-                </div>
-                {item.name}
-              </li>
-            ))}
+            {data.map((item, i) => {
+              console.log(value, item.id)
+              return (
+                <li
+                  key={i}
+                  className='flex items-center border-b border-[#E1E3E3] p-[9px] hover:bg-gray-50 cursor-pointer text-sm'
+                  onClick={() => handleSelect(String(item.id))}
+                >
+                  <div
+                    className={`flex items-center justify-center me-4 h-[22px] w-[22px] rounded-full border border-[#09090B] ${value === item.name && 'bg-black'}`}>
+                    {value === item.name && <CheckIcon/>}
+                  </div>
+                  {item.name}
+                </li>
+              )
+            })}
           </ul>
         </div>}
       </div>

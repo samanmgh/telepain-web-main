@@ -170,6 +170,8 @@ export default function RegisterForm() {
     }
   };
 
+  console.log(form.control)
+
   return (
     <form autoComplete="off" onSubmit={form.handleSubmit(handleSubmit)}
           className="max-md:px-4 pt-[32.5px] pb-[125px] w-full md:w-[454px]">
