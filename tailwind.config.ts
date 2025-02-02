@@ -23,12 +23,19 @@ const config: Config = {
       colors: {
         'primary': {
           100: '#283F63',
+          200: '#1678F2',
+          300: '#3A8EF6',
+          400: '#6F3AFA',
+          500: '#F2F7FF',
+          600: '#65A8FB'
         },
         secondary: {
-          100: '#7DD2B2'
+          100: '#7DD2B2',
+          200: '#00BFA5'
         },
         'gray': {
-          100: '#666666'
+          100: '#666666',
+          200: '#6C87AE'
         }
       },
       backgroundImage: {

@@ -1,44 +1,30 @@
-import {useLocale, useTranslations} from "next-intl";
+import {useTranslations} from "next-intl";
+import Image from "next/image";
+import WhiteLogo from "@/assets/images/white-logo.png";
 import Link from "next/link";
+import {LinkedInIcon} from "@/assets/icons/index";
 
 export default function Footer({}) {
   const t = useTranslations('footer');
-  const locale = useLocale();
-  const links = [
-    {
-      id: 0,
-      title: t('terms'),
-      src: `/${locale}/`
-    },
-    {
-      id: 1,
-      title: t('about_us'),
-      src: `/${locale}/about-us`
-    },
-  ];
 
   return (
-    <div className='bg-white border-t border-[#C5C5C5]'>
-      <div className="container mx-auto pt-4 pb-6 md:px-10 px-4">
-        <div className="justify-items-center">
-          <ul className="flex justify-center mb-6">
-            {links.map((item) => (
-              <li key={item.id} className='mx-6'>
-                <Link className="text-xs font-bold hover:text-primary-200"
-                      href={item.src}>{item.title}</Link>
-              </li>
-            ))}
-          </ul>
-
-          <div className='flex justify-center gap-12'>
-            {/*<LinkedInIcon size='32'/>*/}
-            {/*<TelegramIcon size='32'/>*/}
-            {/*<InstagramIcon size='32'/>*/}
+    <div className='bg-primary-200'>
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          <div className="col-span-1 py-8">
+            <Image src={WhiteLogo} alt={t("title")} width={56} height={25}/>
+            <div className="text-white !font-[300] italic mt-4 mb-2">{t("description")}</div>
+            <Link href="https://www.linkedin.com/company/telepain">
+              <LinkedInIcon/>
+            </Link>
           </div>
-        </div>
-
-        <div className='mt-[128px] text-center text-xs font-bold'>
-          کلیه حقوق این وب‌سایت محفوظ است © 2024 | بهره‌برداری و بازنشر مطالب تنها با ذکر منبع مجاز است.
+          <div className="col-span-1 flex justify-start md:justify-end py-8">
+            <div>
+              <div className="text-white text-[20px] !font-[600]">{t("contact")}</div>
+              <div className="text-white !font-[400] mt-6">+1 (604) 399 4002</div>
+              <div className="text-white !font-[400] mt-4">info@telepainsolutions.ca</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -8,8 +8,16 @@
     "submit_order": "submit_order"
   },
   "footer": {
-    "terms": "Terms",
-    "about_us": "About us"
+    "title": "Telepain soloutions",
+    "description": "350-889 Harbourside, BC",
+    "contact": "Contact"
+  },
+  "landing": {
+    "title": "Telepain soloutions",
+    "app_button": "Go to App",
+    "subtitle": "Your path to Relief Status Here :",
+    "display_name": "Telepainsoloutions",
+    "description": "connects you with top pain specialist across canada, offering personalized care and seamless virtual consultation from the comfort of your home"
   },
   "auth": {
     "login": {
