@@ -117,7 +117,6 @@ export interface ResetPasswordDto {
    * @format email
    * @minLength 1
    */
-  email: string;
   /** @minLength 1 */
   token: string;
   /**
@@ -125,6 +124,7 @@ export interface ResetPasswordDto {
    * @maxLength 100
    */
   newPassword: string;
+  confirmPassword: string;
 }
 
 export interface User {

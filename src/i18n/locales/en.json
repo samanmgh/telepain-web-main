@@ -42,6 +42,19 @@
       "birth_date": "Date of birth",
       "create_account": "Create an account",
       "invalid_input": "{key} is not valid"
+    },
+    "forget_password": {
+      "back": "back",
+      "title": "Forget your password",
+      "email": "Email",
+      "continue": "Continue"
+    },
+    "reset_password": {
+      "back": "back",
+      "title": "Reset your password",
+      "new_password": "New password",
+      "confirm_password": "Confirm new password",
+      "submit": "Submit"
     }
   }
 }

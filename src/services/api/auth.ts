@@ -1,5 +1,11 @@
 import {
-  ApiResponse, ForgotPasswordDto, LoginDto, LoginResult, RegisterDto, ResetPasswordDto, VAuthConfirmEmailDetailParams,
+  ApiResponse,
+  ForgotPasswordDto,
+  LoginDto,
+  LoginResult,
+  RegisterDto,
+  ResetPasswordDto,
+  VAuthConfirmEmailDetailParams,
 } from "@/types";
 import {http} from "../http";
 
