@@ -118,7 +118,7 @@ export default function LoginForm() {
       />
 
       <Link className='block underline text-right'
-            href={`/${locale}/auth/forgot-password`}>{t('forgot_password')}</Link>
+            href={`/${locale}/auth/forget-password`}>{t('forgot_password')}</Link>
 
       <div className="flex items-center gap-x-3 mt-2">
         <input

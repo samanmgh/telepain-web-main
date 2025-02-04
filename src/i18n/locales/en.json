@@ -66,6 +66,10 @@
       "new_password": "New password",
       "confirm_password": "Confirm new password",
       "submit": "Submit"
+    },
+    "confirm_email": {
+      "title": "Check your Email",
+      "subtitle": "We've sent you an email with a link to reset your password. Please check your inbox and follow the instructions."
     }
   }
 }

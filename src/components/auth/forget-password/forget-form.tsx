@@ -40,7 +40,7 @@ export default function ForgetForm() {
     try {
       const res = await authApi.forgotPassword({...data}).fetch();
       toast.success(res.meta.displayMessage);
-      router.push('/');
+      router.push(`/${locale}/auth/confirm-email`);
     } catch (e) {
       console.log(e);
     } finally {
