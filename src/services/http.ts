@@ -42,6 +42,7 @@ class RequestConfig {
       try {
         d = await res.json();
       } catch (e) {
+        console.log(e)
         d = null;
       }
       if (!res.ok) {

@@ -44,6 +44,7 @@ export interface ApiResponse<T = never> {
   meta: ApiMeta;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface ApiMeta<T = never> {
   displayMessage: string;
   result: string;
@@ -73,6 +74,7 @@ export interface ErrorMeta<T = unknown> {
 
 export type ReqKey<R, D, P> = RequestMeta<R, D, P> | null | undefined | false;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type ReqMetaSWRConfig<R, D, P> =
   | SWRConfiguration<R, ErrorResponse<ErrorMeta>, Fetcher<R, Key>>
   | undefined;
