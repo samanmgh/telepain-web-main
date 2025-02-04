@@ -15,9 +15,12 @@
   "landing": {
     "title": "Telepain soloutions",
     "app_button": "Go to App",
+    "login_button": "Sign in",
     "subtitle": "Your path to Relief Status Here :",
     "display_name": "Telepainsoloutions",
-    "description": "connects you with top pain specialist across canada, offering personalized care and seamless virtual consultation from the comfort of your home"
+    "description1": "Thank you for registering with Telepainsolutions! We appreciate your trust in our virtual pain management services.",
+    "description2": "Our AI triage application is currently under development and will be available soon. We will notify you via email as soon as it is ready.",
+    "description3": "Stay tuned for updates, and we look forward to providing you with high-quality, personalized care!"
   },
   "auth": {
     "login": {
