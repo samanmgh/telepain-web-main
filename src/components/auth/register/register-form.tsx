@@ -165,7 +165,7 @@ export default function RegisterForm() {
         dateOfBirth: new Date(data.dateOfBirth).toISOString()
       }).fetch();
       toast.success(res.meta.displayMessage);
-      router.push(`/${locale}/auth/login`);
+      router.push(`/${locale}/auth/confirm-email`);
     } catch (e){
       console.log(e);
     } finally {

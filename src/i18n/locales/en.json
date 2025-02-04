@@ -69,7 +69,7 @@
     },
     "confirm_email": {
       "title": "Check your Email",
-      "subtitle": "We've sent you an email with a link to reset your password. Please check your inbox and follow the instructions."
+      "subtitle": "We've sent you an email with a link. Please check your inbox and follow the instructions."
     }
   }
 }
