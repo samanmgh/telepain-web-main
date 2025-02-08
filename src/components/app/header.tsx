@@ -16,7 +16,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 right-0 w-full h-[98px] z-20 shadow-custom-header bg-white">
-      <div className="px-[56px] h-full">
+      <div className="px-4 md:px-[56px] h-full">
         <div className="flex justify-between h-full items-center">
           <Link href='/'>
             <Image
